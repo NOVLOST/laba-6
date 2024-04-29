@@ -18,11 +18,26 @@ t = 2
 n = 1
 k = 0
 k = int ( input ( "Введите количество товаров К= " ) )
-combi=[]
+combi = []
+premiumScore = 0
+costScore = 0
+display = []
+class Tovar_premium:
+    def __init__(self,prefix,id,cost):
+        self.prefix = prefix
+        self.id = id
+        self.cost = cost
+
+class Tovar_lowcost:
+    def __init__(self,prefix,id,cost):
+        self.prefix = prefix
+        self.id = id
+        self.cost = cost
+
 
 
 """ ______________________________________________________________
-    ||             первая часть через библиотеку               ||
+    ||             первая часть через стандарт                 ||
     ||                                                         ||
     --------------------------------------------------------------"""
 
@@ -103,44 +118,127 @@ print(f'\nВремя выполнения питон функции {end-start}'
     ||                                                                                        ||
     -------------------------------------------------------------------------------------------"""
 
-pause=input("\n\n\nпо новому условию функция работает только с четными размерами комбинаций \n\nДЛЯ ПРОДОЛЖЕНИЯ ВВЕДИТЕ ЛЮБОЙ СИМВОЛ")
+pause=input("\n\n\n\n\nпо новому условию функция работает только с четными размерами комбинаций \n\nДЛЯ ПРОДОЛЖЕНИЯ ВВЕДИТЕ ЛЮБОЙ СИМВОЛ\n\n\n\n")
 y = t
 start=time.time()
-
+spisok = []
 while   y <= n: #идем от меньшего к большему
 
-    for i in range(0, k): #добовляем числа по размеру списка определяемого y
-        if len(combi) >= y and y % 2 == 0:
-            break
-            print(f'\n первая комбинация из {y} элементов {combi}')  # выводим первую комбинацию
+
+
+    for i in range(0, k):
+
+        if i % 2 == 0 and len(spisok) < y :
+            combi = Tovar_premium("PREMIUM", i, (i+1) * 100)
+            spisok.append([combi.id, combi.prefix, combi.cost])
+        elif len(spisok) < y:
+            combi = Tovar_premium("LOWCOST", i, (i+1) * 10)
+            spisok.append([combi.id, combi.prefix, combi.cost])
         else:
-            combi.append(i)
+            break
 
 
-    combi.append( k ) #нужны для определения момента выхода из цикла
-    combi.append( 0 )
+
+
+    spisok.append( ( k,0,0)) #нужны для определения момента выхода из цикла
+    spisok.append( (0, 0) )
+
 
     while True:
 
 
-        for i in range( len(combi) - 1 ):
-            if combi[i] + 1 == combi[i + 1]: #если следующий элемент= предидущий + 1 то идем дальше присаваивая предидущиму значение его индекса
 
-                combi[i] = i
+        for i in range( len(spisok) - 1  ):
+
+
+
+            if spisok[i][0] + 1 == spisok[i+1][0]: #если следующий элемент= предидущий + 1 то идем дальше присаваивая предидущиму значение его индекса
+
+
+
+                for j in range(len(spisok)-1):
+                    if spisok[j][1] == "PREMIUM":
+                        premiumScore += 1
+
+                    if spisok[j][2] > (k - t) * 100:
+                        costScore += 1
+
+                if premiumScore > y - t and costScore < k - t:
+                    print(f'новая комбинация на {y} элементов {spisok[:-2]} \n ')
+                    premiumScore = 0
+                    costScore = 0
+                else:
+                    premiumScore = 0
+                    costScore = 0
+
+
+                if spisok[i ][0] % 2 == 0:
+                    spisok[i ][1] = "PREMIUM"
+                    spisok[i ][2] = spisok[i ][0] * 100
+                else:
+                    spisok[i ][1] = "LOWCOST"
+                    spisok[i ][2] = spisok[i ][0] * 10
 
             else:
 
+
+
                 break
 
-        if i < y : #если индекс элемента меньше размера комбинации то выводим комбинацю
 
-            combi[i] += 1
-            print(f"\n {combi[:-2]}")
+
+        if i < y:
+            for j in range(len(spisok) - 1):
+                if spisok[j][1] == "PREMIUM":
+                    premiumScore += 1
+
+                if spisok[j][2] > (k - t) * 100:
+                    costScore += 1
+            if premiumScore > y - t and costScore < k - t:
+                print(f'новая комбинация на {y} элементов {spisok[:-2]} \n ')
+                premiumScore = 0
+                costScore = 0
+            else:
+                premiumScore = 0
+                costScore = 0
+
+
+            spisok[i ][0] += 1
+
+
+
+            if spisok[i ][0] % 2 ==0:
+                spisok[i ][1]= "PREMIUM"
+                spisok[i ][2] = spisok[i ][0] * 100
+                premiumScore = 0
+                costScore = 0
+            else:
+                spisok[i ][1] = "LOWCOST"
+                spisok[i ][2] = spisok[i ][0] * 10
+                premiumScore = 0
+                costScore = 0
+
+            for j in range(len(spisok) - 1):
+                if spisok[j][1] == "PREMIUM":
+                    premiumScore += 1
+
+                if spisok[j][2] > (k - t) * 100:
+                    costScore += 1
+            if premiumScore > y - t and costScore < k - t:
+                    print(f'новая комбинация на {y} элементов {spisok[:-2]} \n ')
+                    premiumScore = 0
+                    costScore = 0
+            else:
+                premiumScore = 0
+                costScore = 0
 
         else:
+            costScore = 0
+            premiumScore = 0
+
 
             y += 1
-            combi.clear()
+            spisok.clear()
             break
 
 
@@ -153,16 +251,43 @@ start=time.time()
 
 
 print("\n\nТЕПЕРЬ  через библиотеку itertools\n\n")
-combi=[i for i in range(0,k) ]
+for i in range(0, k):
+
+    if i % 2 == 0:
+
+        combi = Tovar_premium("PREMIUM", i, (i+1 ) * 100)
+        spisok.append([combi.id, combi.prefix, combi.cost])
+    else:
+
+        combi = Tovar_premium("LOWCOST", i, (i+1 ) * 10)
+        spisok.append([combi.id, combi.prefix, combi.cost])
+
 
 
 for g in range(t,n+1):
-    if g % 2 == 0:
 
-        tmp=itertools.combinations(combi,g)
-        print(f'\n{list(tmp)},\n комбинций из {g} элементов')
-    else:
+    tmp=[]
+    tmp=list(itertools.combinations(spisok,g))
+    for i in range(0,len(tmp)):
 
-        continue
-end = time.time()
-print(f'\nВремя выполнения питон функции {end-start}')
+
+        if premiumScore > g - t and costScore < k - t:
+
+            print(f'\n{list(tmp[i-1])},\n комбинций из {g} элементов')
+            premiumScore = 0
+            costScore = 0
+
+        else:
+
+            premiumScore = 0
+            costScore = 0
+
+
+
+        for j in range(0,len(tmp[0])):
+            if tmp[i][j][1] == "PREMIUM":
+                premiumScore += 1
+
+            if tmp[i][j][2] > (k - t) * 100:
+                costScore += 1
+
